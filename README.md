@@ -6,10 +6,10 @@ CLI for the [OpenModels](https://openmodels.run) — browse models, compare prov
 
 ```bash
 # Run without installing
-npx openmodels
+npx @openmodels/cli
 
 # Install globally
-npm install -g openmodels
+npm install -g @openmodels/cli
 ```
 
 Requires **Node.js ≥ 22.0.0**.
