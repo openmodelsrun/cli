@@ -1,28 +1,37 @@
 import chalk, { Chalk, type ChalkInstance } from 'chalk';
 
+function shouldDisableColor(): boolean {
+  if (process.env['NO_COLOR'] !== undefined && process.env['NO_COLOR'] !== '') {
+    return true;
+  }
+  if (!process.stdout.isTTY) {
+    return true;
+  }
+  return false;
+}
+
 /**
- * @param noColor - When true, forces all color output off (level 0)
- * @returns A chalk instance with the appropriate color level
+ *
+ * @param noColor - When true, forces all color output off (level 0).
+ * @returns A chalk instance configured for the current environment
  */
 export function createColors(noColor?: boolean): ChalkInstance {
-  if (noColor) {
+  const disabled = noColor ?? shouldDisableColor();
+  if (disabled) {
     return new Chalk({ level: 0 });
   }
   return chalk;
 }
 
-let colors: ChalkInstance = chalk;
+let colors: ChalkInstance = createColors();
 
 /**
- * @param noColor - When true, disables all color output
+ * @param enabled - When false, disables all ANSI color output.
  */
-export function configureColors(noColor: boolean): void {
-  colors = createColors(noColor);
+export function setColorEnabled(enabled: boolean): void {
+  colors = createColors(!enabled);
 }
 
-/**
- * Returns the current module-level chalk instance.
- */
 export function getColors(): ChalkInstance {
   return colors;
 }
