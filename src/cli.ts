@@ -1,5 +1,9 @@
 import { Command, Option } from 'commander';
 import { createRequire } from 'node:module';
+import { registerSearchCommand } from './commands/search.js';
+import { registerProvidersCommand } from './commands/providers.js';
+import { registerModelsCommand } from './commands/models.js';
+import { registerCompletionsCommand } from './commands/completions.js';
 
 const require = createRequire(import.meta.url);
 const pkg = require('../package.json') as { version: string };
@@ -37,6 +41,12 @@ export function createProgram(): Command {
   program.action(() => {
     program.help();
   });
+
+  // Register command groups
+  registerModelsCommand(program);
+  registerProvidersCommand(program);
+  registerSearchCommand(program);
+  registerCompletionsCommand(program);
 
   return program;
 }

@@ -16,8 +16,8 @@ declare module '@openmodels/sdk' {
     getRankedProviders(modelId: string, minUptime?: number): Promise<unknown>;
     getProviders(params?: Record<string, unknown>): Promise<unknown>;
     getProvider(id: string): Promise<unknown>;
-    getProviderHealth(id: string): Promise<unknown>;
-    getProviderLatency(id: string): Promise<unknown>;
+    getProviderHealth(id: string, params?: Record<string, unknown>): Promise<unknown>;
+    getProviderLatency(id: string, params?: Record<string, unknown>): Promise<unknown>;
     getHealth(): Promise<unknown>;
   }
 
