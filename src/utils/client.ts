@@ -13,10 +13,19 @@ export interface OpenModelsClientInterface {
 
 export function createClient(config: ResolvedConfig): OpenModelsClientInterface {
   const require = createRequire(import.meta.url);
-  const { OpenModelsClient } = require('@openmodels/sdk') as {
-    OpenModelsClient: new (opts: { baseUrl: string; apiKey?: string }) => OpenModelsClientInterface;
-  };
-  return new OpenModelsClient({
+
+  let sdk: { OpenModelsClient: new (opts: { baseUrl: string; apiKey?: string }) => OpenModelsClientInterface };
+  try {
+    sdk = require('@openmodels/sdk') as typeof sdk;
+  } catch {
+    console.error(
+      'Error: @openmodels/sdk is not installed.\n' +
+      'Install it with: npm install @openmodels/sdk\n'
+    );
+    process.exit(1);
+  }
+
+  return new sdk.OpenModelsClient({
     baseUrl: config.apiUrl,
     apiKey: config.apiKey,
   });

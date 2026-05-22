@@ -22,7 +22,7 @@ export function output<T>(data: T | T[], format: OutputFormat, columns?: TableCo
     case 'table':
     default:
       if (!columns) {
-
+        // No column definitions provided — fall back to JSON for structured output
         formatJson(data);
         return;
       }
