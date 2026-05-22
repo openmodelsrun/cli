@@ -1,8 +1,10 @@
 import { Command, Option } from 'commander';
 import { createRequire } from 'node:module';
-import { registerSearchCommand } from './commands/search.js';
-import { registerProvidersCommand } from './commands/providers.js';
 import { registerModelsCommand } from './commands/models.js';
+import { registerProvidersCommand } from './commands/providers.js';
+import { registerCompareCommand } from './commands/compare.js';
+import { registerSearchCommand } from './commands/search.js';
+import { registerTelemetryCommand } from './commands/telemetry.js';
 import { registerCompletionsCommand } from './commands/completions.js';
 
 const require = createRequire(import.meta.url);
@@ -45,7 +47,9 @@ export function createProgram(): Command {
   // Register command groups
   registerModelsCommand(program);
   registerProvidersCommand(program);
+  registerCompareCommand(program);
   registerSearchCommand(program);
+  registerTelemetryCommand(program);
   registerCompletionsCommand(program);
 
   return program;

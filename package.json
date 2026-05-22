@@ -1,6 +1,6 @@
 {
   "name": "@openmodels/cli",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "CLI for the OpenModels registry",
   "bin": {
     "openmodels": "./dist/bin/openmodels.js"

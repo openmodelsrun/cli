@@ -1,16 +1,18 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-
-vi.mock('@openmodels/sdk', () => {
-  const MockOpenModelsClient = vi.fn();
-  return {
-    OpenModelsClient: MockOpenModelsClient,
-    default: MockOpenModelsClient,
-  };
-});
-
-import { OpenModelsClient } from '@openmodels/sdk';
 import { createClient } from '../../../src/utils/client.js';
 import type { ResolvedConfig } from '../../../src/config/types.js';
+
+// Mock node:module's createRequire to return a mock SDK
+const MockOpenModelsClient = vi.fn();
+
+vi.mock('node:module', () => ({
+  createRequire: () => (id: string) => {
+    if (id === '@openmodels/sdk') {
+      return { OpenModelsClient: MockOpenModelsClient };
+    }
+    throw new Error(`Cannot find module '${id}'`);
+  },
+}));
 
 describe('createClient', () => {
   beforeEach(() => {
@@ -26,7 +28,7 @@ describe('createClient', () => {
 
     createClient(config);
 
-    expect(OpenModelsClient).toHaveBeenCalledWith({
+    expect(MockOpenModelsClient).toHaveBeenCalledWith({
       baseUrl: 'https://api.openmodels.run',
       apiKey: undefined,
     });
@@ -42,7 +44,7 @@ describe('createClient', () => {
 
     createClient(config);
 
-    expect(OpenModelsClient).toHaveBeenCalledWith({
+    expect(MockOpenModelsClient).toHaveBeenCalledWith({
       baseUrl: 'https://api.openmodels.run',
       apiKey: 'om_test_key_123',
     });
@@ -58,7 +60,7 @@ describe('createClient', () => {
 
     createClient(config);
 
-    expect(OpenModelsClient).toHaveBeenCalledWith({
+    expect(MockOpenModelsClient).toHaveBeenCalledWith({
       baseUrl: 'https://custom.api.example.com',
       apiKey: 'my-key',
     });
