@@ -1,7 +1,7 @@
 {
-  "name": "@openmodels/cli",
+  "name": "openmodels-cli",
   "version": "0.5.0",
-  "description": "CLI for the OpenModels registry",
+  "description": "Command-line interface for the OpenModels registry — browse, search, and compare LLM models and inference providers from your terminal.",
   "bin": {
     "openmodels": "./bin/openmodels.js"
   },
@@ -22,15 +22,18 @@
     "test:coverage": "vitest run --coverage",
     "lint": "eslint \"src/**/*.ts\" --fix",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
-    "@openmodels/sdk": "^0.7.0",
     "chalk": "^5.6.2",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.3",
     "ora": "^9.4.0",
     "yaml": "^2.9.0"
+  },
+  "optionalDependencies": {
+    "@openmodels/sdk": "^0.7.0"
   },
   "devDependencies": {
     "@types/node": "^22.0.0",
@@ -45,11 +48,33 @@
     "llm",
     "ai",
     "models",
-    "registry"
+    "inference",
+    "providers",
+    "registry",
+    "compare",
+    "pricing",
+    "openai",
+    "anthropic",
+    "gemini",
+    "deepseek",
+    "groq",
+    "together-ai",
+    "machine-learning",
+    "developer-tools",
+    "terminal",
+    "command-line"
   ],
   "license": "MIT",
+  "author": "OpenModels <hi@openmodels.run> (https://openmodels.run)",
+  "homepage": "https://openmodels.run",
+  "bugs": {
+    "url": "https://github.com/openmodelsrun/cli/issues"
+  },
   "repository": {
     "type": "git",
-    "url": "https://github.com/openmodels/openmodels"
+    "url": "https://github.com/openmodelsrun/cli"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
