@@ -5,6 +5,34 @@ import { createSpinner } from '../ui/spinner.js';
 import { output, type TableColumn } from '../formatters/index.js';
 import { handleError } from '../utils/errors.js';
 
+interface ApiCompareResponse {
+  model_id: string;
+  model_name: string;
+  providers: ApiCompareProvider[];
+  lowest_input_price: number;
+  lowest_output_price: number;
+}
+
+interface ApiCompareProvider {
+  provider_id: string;
+  provider_name: string;
+  pricing: {
+    currency: string;
+    input_per_million: number;
+    output_per_million: number;
+    cache_read_per_million?: number;
+    cache_write_per_million?: number;
+  };
+  rate_limits: {
+    tokens_per_minute: number;
+    requests_per_minute: number;
+  };
+  context_window: number;
+  uptime_24h: number;
+  avg_ttft_ms: number;
+  total_cost_estimate: number;
+}
+
 interface ComparisonRow {
   provider_name: string;
   input_price: number;
@@ -64,8 +92,16 @@ export function registerCompareCommand(program: Command): void {
 
       try {
         spinner.start();
-        const rows = (await client.compareProviders(modelId, opts.sort)) as ComparisonRow[];
+        const response = (await client.compareProviders(modelId, opts.sort)) as ApiCompareResponse;
         spinner.stop();
+
+        const rows: ComparisonRow[] = (response.providers ?? []).map((p) => ({
+          provider_name: p.provider_name,
+          input_price: p.pricing.input_per_million,
+          output_price: p.pricing.output_per_million,
+          rate_limits: `${p.rate_limits.requests_per_minute} RPM / ${p.rate_limits.tokens_per_minute} TPM`,
+          regions: [],
+        }));
 
         const sorted = sortRows(rows, opts.sort);
         output(sorted, config.format, compareColumns);

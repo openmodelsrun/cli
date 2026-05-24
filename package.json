@@ -1,6 +1,6 @@
 {
   "name": "openmodels-cli",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Command-line interface for the OpenModels registry — browse, search, and compare LLM models and inference providers from your terminal.",
   "bin": {
     "openmodels": "./bin/openmodels.js"

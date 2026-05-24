@@ -1,4 +1,5 @@
 import type { ResolvedConfig } from '../config/types.js';
+import { NotFoundError, RateLimitError, NetworkError } from './errors.js';
 
 export interface OpenModelsClientInterface {
   getModels(opts?: Record<string, unknown>): Promise<unknown>;
@@ -50,12 +51,12 @@ class HttpClient implements OpenModelsClientInterface {
 
   async getProviderHealth(providerId: string, opts?: Record<string, unknown>): Promise<unknown> {
     const params = this.buildParams(opts);
-    return this.request(`/api/telemetry/health/${encodeURIComponent(providerId)}${params}`);
+    return this.request(`/api/providers/${encodeURIComponent(providerId)}/health${params}`);
   }
 
   async getProviderLatency(providerId: string, opts?: Record<string, unknown>): Promise<unknown> {
     const params = this.buildParams(opts);
-    return this.request(`/api/telemetry/latency/${encodeURIComponent(providerId)}${params}`);
+    return this.request(`/api/providers/${encodeURIComponent(providerId)}/latency${params}`);
   }
 
   private buildParams(opts?: Record<string, unknown>): string {
@@ -80,23 +81,33 @@ class HttpClient implements OpenModelsClientInterface {
       headers['Authorization'] = `Bearer ${this.apiKey}`;
     }
 
-    const response = await fetch(url, { headers });
+    let response: Response;
+    try {
+      response = await fetch(url, { headers });
+    } catch (err) {
+      throw new NetworkError(
+        'Unable to reach the OpenModels API. Check your network connection.',
+        err instanceof Error ? err : undefined,
+      );
+    }
 
     if (!response.ok) {
       const body = await response.text();
       let message = `API error: ${response.status} ${response.statusText}`;
+      let timestamp: string | undefined;
       try {
         const json = JSON.parse(body);
         if (json.message) message = json.message;
+        if (json.timestamp) timestamp = json.timestamp;
       } catch {
         // use default message
       }
 
       if (response.status === 404) {
-        throw new Error(`Not found: ${message}`);
+        throw new NotFoundError(message, timestamp);
       }
       if (response.status === 429) {
-        throw new Error(`Rate limited: ${message}`);
+        throw new RateLimitError(message, undefined, timestamp);
       }
       throw new Error(message);
     }

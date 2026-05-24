@@ -7,15 +7,21 @@ import { handleError } from '../utils/errors.js';
 import { getColors } from '../ui/colors.js';
 
 interface HealthMetrics {
+  provider_id: string;
   status: string;
-  uptime_percentage: number;
+  uptime_24h: number;
+  uptime_7d: number;
+  last_checked_at: string;
 }
 
 interface LatencyMetrics {
-  avg_ttft: number;
-  avg_response_time: number;
-  p95_ttft: number;
-  p95_response_time: number;
+  provider_id: string;
+  model_id: string;
+  avg_ttft_ms: number;
+  avg_total_time_ms: number;
+  p50_ms: number;
+  p95_ms: number;
+  p99_ms: number;
 }
 
 interface TelemetryRow {
@@ -50,17 +56,19 @@ export function registerTelemetryCommand(program: Command): void {
         const latency = latencyData as LatencyMetrics;
         const colors = getColors();
 
-        const statusDisplay = health.status === 'up'
+        const statusDisplay = health.status === 'healthy'
           ? colors.green('● UP')
           : colors.red('● DOWN');
 
         const rows: TelemetryRow[] = [
           { metric: 'Status', value: statusDisplay },
-          { metric: 'Uptime', value: `${health.uptime_percentage.toFixed(2)}%` },
-          { metric: 'Avg TTFT', value: `${latency.avg_ttft.toFixed(2)} ms` },
-          { metric: 'Avg Response Time', value: `${latency.avg_response_time.toFixed(2)} ms` },
-          { metric: 'P95 TTFT', value: `${latency.p95_ttft.toFixed(2)} ms` },
-          { metric: 'P95 Response Time', value: `${latency.p95_response_time.toFixed(2)} ms` },
+          { metric: 'Uptime (24h)', value: `${health.uptime_24h.toFixed(2)}%` },
+          { metric: 'Uptime (7d)', value: `${health.uptime_7d.toFixed(2)}%` },
+          { metric: 'Avg TTFT', value: `${latency.avg_ttft_ms.toFixed(2)} ms` },
+          { metric: 'Avg Total Time', value: `${latency.avg_total_time_ms.toFixed(2)} ms` },
+          { metric: 'P50 Latency', value: `${latency.p50_ms.toFixed(2)} ms` },
+          { metric: 'P95 Latency', value: `${latency.p95_ms.toFixed(2)} ms` },
+          { metric: 'P99 Latency', value: `${latency.p99_ms.toFixed(2)} ms` },
         ];
 
         const columns: TableColumn<TelemetryRow>[] = [
